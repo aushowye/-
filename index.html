@@ -46,6 +46,21 @@
             margin-top: 8px;
         }
 
+        .save-indicator {
+            display: inline-block;
+            margin-left: 10px;
+            padding: 4px 12px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 12px;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .save-indicator.show {
+            opacity: 1;
+        }
+
         .progress-info {
             margin: 15px 0 10px;
             font-size: 15px;
@@ -134,6 +149,23 @@
         .filter-btn.active {
             background: #667eea;
             color: white;
+        }
+
+        .reset-btn {
+            padding: 8px 18px;
+            border: 2px solid #f44336;
+            background: white;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            color: #f44336;
+            font-weight: 500;
+            margin-left: auto;
+        }
+
+        .reset-btn:hover {
+            background: #ffebee;
         }
 
         .question-container {
@@ -452,6 +484,13 @@
             margin: 8px 0;
         }
 
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
         @media (max-width: 768px) {
             .container {
                 margin: 10px;
@@ -475,7 +514,10 @@
     <div class="container">
         <div class="header">
             <h1>♥️🐷♥️在线刷题系统♥️🐷♥️</h1>
-            <div class="subtitle">共 1535 道题</div>
+            <div class="subtitle">
+                共 1535 道题 
+                <span class="save-indicator" id="saveIndicator">✓ 已自动保存</span>
+            </div>
             <div class="progress-info">
                 <span id="progressText">准备开始...</span>
             </div>
@@ -504,7 +546,10 @@
         </div>
 
         <div class="filter-section">
-            <div class="filter-label">筛选条件：</div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <div class="filter-label">筛选条件：</div>
+                <button class="reset-btn" onclick="resetProgress()">🗑️ 清除进度</button>
+            </div>
             <div class="filter-buttons">
                 <button class="filter-btn active" onclick="filterQuestions('all')">全部题目</button>
                 <button class="filter-btn" onclick="filterQuestions('公共部分')">公共部分</button>
@@ -553,7 +598,10 @@
                 <p>答错题数：<strong id="modalWrong" style="color: #f44336;">0</strong></p>
                 <p>正确率：<strong id="modalAccuracy" style="color: #2196F3;">0%</strong></p>
             </div>
-            <button class="btn btn-next" onclick="restartQuiz()">重新开始</button>
+            <div class="modal-buttons">
+                <button class="btn btn-next" onclick="continueQuiz()">继续刷题</button>
+                <button class="btn btn-prev" onclick="restartQuiz()">重新开始</button>
+            </div>
         </div>
     </div>
 
@@ -564,9 +612,67 @@
         let userAnswers = [];
         let selectedOptions = new Set();
 
+        // ⭐ 本地存储功能
+        const STORAGE_KEY = 'fujian_exam_progress';
+
+        // 保存进度到本地存储
+        function saveProgress() {
+            const progress = {
+                currentIndex: currentIndex,
+                userAnswers: userAnswers,
+                timestamp: new Date().toISOString()
+            };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+            showSaveIndicator();
+        }
+
+        // 显示保存提示
+        function showSaveIndicator() {
+            const indicator = document.getElementById('saveIndicator');
+            indicator.classList.add('show');
+            setTimeout(() => {
+                indicator.classList.remove('show');
+            }, 2000);
+        }
+
+        // 加载已保存的进度
+        function loadProgress() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                try {
+                    const progress = JSON.parse(saved);
+                    currentIndex = progress.currentIndex || 0;
+                    userAnswers = progress.userAnswers || [];
+
+                    // 确保userAnswers长度匹配题目数量
+                    while (userAnswers.length < filteredQuestions.length) {
+                        userAnswers.push(null);
+                    }
+
+                    console.log('已加载保存的进度:', progress.timestamp);
+                    return true;
+                } catch (e) {
+                    console.error('加载进度失败:', e);
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        // 清除进度
+        function resetProgress() {
+            if (confirm('确定要清除所有答题进度吗？此操作不可恢复！')) {
+                localStorage.removeItem(STORAGE_KEY);
+                currentIndex = 0;
+                userAnswers = new Array(filteredQuestions.length).fill(null);
+                showQuestion();
+                updateStats();
+                alert('进度已清除！');
+            }
+        }
+
         async function loadQuestions() {
             try {
-                // ⭐ 关键：这里使用questions.json
                 const response = await fetch('questions.json');
                 if (!response.ok) {
                     throw new Error('HTTP ' + response.status);
@@ -582,8 +688,16 @@
 
         function initQuiz() {
             document.getElementById('totalQuestions').textContent = filteredQuestions.length;
-            currentIndex = 0;
-            userAnswers = new Array(filteredQuestions.length).fill(null);
+
+            // 尝试加载保存的进度
+            const hasProgress = loadProgress();
+
+            if (!hasProgress) {
+                // 没有保存的进度，从头开始
+                currentIndex = 0;
+                userAnswers = new Array(filteredQuestions.length).fill(null);
+            }
+
             showQuestion();
             updateStats();
         }
@@ -723,6 +837,7 @@
 
             showAnswerFeedback();
             updateStats();
+            saveProgress(); // ⭐ 提交答案后自动保存
         }
 
         function showAnswerFeedback() {
@@ -777,6 +892,7 @@
             if (currentIndex > 0) {
                 currentIndex--;
                 showQuestion();
+                saveProgress(); // ⭐ 切换题目时保存
             }
         }
 
@@ -784,6 +900,7 @@
             if (currentIndex < filteredQuestions.length - 1) {
                 currentIndex++;
                 showQuestion();
+                saveProgress(); // ⭐ 切换题目时保存
             } else {
                 showCompletionModal();
             }
@@ -823,6 +940,10 @@
             document.getElementById('totalQuestions').textContent = filteredQuestions.length;
             currentIndex = 0;
             userAnswers = new Array(filteredQuestions.length).fill(null);
+
+            // 清除筛选时的进度
+            localStorage.removeItem(STORAGE_KEY);
+
             showQuestion();
             updateStats();
         }
@@ -841,12 +962,19 @@
             document.getElementById('completionModal').classList.add('show');
         }
 
-        function restartQuiz() {
+        function continueQuiz() {
             document.getElementById('completionModal').classList.remove('show');
-            currentIndex = 0;
-            userAnswers = new Array(filteredQuestions.length).fill(null);
-            showQuestion();
-            updateStats();
+        }
+
+        function restartQuiz() {
+            if (confirm('确定要重新开始吗？当前进度将被清除。')) {
+                document.getElementById('completionModal').classList.remove('show');
+                localStorage.removeItem(STORAGE_KEY);
+                currentIndex = 0;
+                userAnswers = new Array(filteredQuestions.length).fill(null);
+                showQuestion();
+                updateStats();
+            }
         }
 
         loadQuestions();
