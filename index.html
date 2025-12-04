@@ -2,22 +2,20 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>♥️🐷♥️在线刷题系统♥️🐷♥️</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 10px;
-            overflow-x: hidden;
+            padding: 20px;
         }
 
         .container {
@@ -27,38 +25,34 @@
             border-radius: 15px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.2);
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            max-height: calc(100vh - 20px);
         }
 
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 15px;
+            padding: 30px;
             text-align: center;
-            flex-shrink: 0;
         }
 
         .header h1 {
-            font-size: 20px;
-            margin-bottom: 5px;
+            font-size: 32px;
+            margin-bottom: 10px;
             font-weight: 600;
         }
 
         .header .subtitle {
-            font-size: 11px;
+            font-size: 14px;
             opacity: 0.9;
-            margin-top: 3px;
+            margin-top: 8px;
         }
 
         .save-indicator {
             display: inline-block;
-            margin-left: 5px;
-            padding: 2px 8px;
+            margin-left: 10px;
+            padding: 4px 12px;
             background: rgba(255,255,255,0.2);
-            border-radius: 10px;
-            font-size: 10px;
+            border-radius: 12px;
+            font-size: 12px;
             opacity: 0;
             transition: opacity 0.3s;
         }
@@ -68,89 +62,88 @@
         }
 
         .progress-info {
-            margin: 8px 0 5px;
-            font-size: 12px;
+            margin: 15px 0 10px;
+            font-size: 15px;
             opacity: 0.95;
         }
 
         .progress-bar {
             background: rgba(255,255,255,0.3);
-            height: 6px;
-            border-radius: 3px;
+            height: 10px;
+            border-radius: 5px;
             overflow: hidden;
-            margin-top: 5px;
+            margin-top: 10px;
         }
 
         .progress-fill {
             background: #4caf50;
             height: 100%;
             transition: width 0.4s ease;
-            border-radius: 3px;
+            border-radius: 5px;
         }
 
         .stats {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            padding: 10px;
+            gap: 15px;
+            padding: 20px;
             background: #f8f9fa;
-            border-bottom: 1px solid #e0e0e0;
-            flex-shrink: 0;
+            border-bottom: 2px solid #e0e0e0;
         }
 
         .stat-item {
             text-align: center;
-            padding: 6px;
+            padding: 10px;
             background: white;
-            border-radius: 6px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
         .stat-label {
-            font-size: 10px;
+            font-size: 13px;
             color: #666;
-            margin-bottom: 3px;
+            margin-bottom: 8px;
         }
 
         .stat-value {
-            font-size: 16px;
+            font-size: 24px;
             font-weight: bold;
             color: #333;
         }
 
         .filter-section {
-            padding: 10px;
+            padding: 20px;
             background: #f8f9fa;
-            border-bottom: 1px solid #e0e0e0;
-            flex-shrink: 0;
+            border-bottom: 2px solid #e0e0e0;
         }
 
         .filter-label {
-            font-size: 11px;
+            font-size: 14px;
             color: #666;
-            margin-bottom: 6px;
+            margin-bottom: 12px;
             font-weight: 500;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
 
         .filter-buttons {
             display: flex;
-            gap: 6px;
+            gap: 10px;
             flex-wrap: wrap;
         }
 
         .filter-btn {
-            padding: 5px 12px;
-            border: 1.5px solid #667eea;
+            padding: 8px 18px;
+            border: 2px solid #667eea;
             background: white;
-            border-radius: 15px;
+            border-radius: 20px;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-size: 11px;
+            font-size: 14px;
             color: #667eea;
             font-weight: 500;
+        }
+
+        .filter-btn:hover {
+            background: #f0f0ff;
         }
 
         .filter-btn.active {
@@ -159,53 +152,53 @@
         }
 
         .reset-btn {
-            padding: 5px 12px;
-            border: 1.5px solid #f44336;
+            padding: 8px 18px;
+            border: 2px solid #f44336;
             background: white;
-            border-radius: 15px;
+            border-radius: 20px;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-size: 11px;
+            font-size: 14px;
             color: #f44336;
             font-weight: 500;
+            margin-left: auto;
+        }
+
+        .reset-btn:hover {
+            background: #ffebee;
         }
 
         .question-container {
-            padding: 15px;
-            overflow-y: auto;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
+            padding: 35px;
         }
 
         .question-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 25px;
             flex-wrap: wrap;
-            gap: 6px;
-            flex-shrink: 0;
+            gap: 10px;
         }
 
         .question-number {
-            font-size: 13px;
+            font-size: 16px;
             color: #666;
             font-weight: 500;
         }
 
         .question-badges {
             display: flex;
-            gap: 6px;
+            gap: 10px;
             align-items: center;
         }
 
         .question-type {
             background: #2196F3;
             color: white;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 11px;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
             font-weight: 500;
         }
 
@@ -220,38 +213,39 @@
         .question-category {
             background: #4caf50;
             color: white;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 11px;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
         }
 
         .question-text {
-            font-size: 15px;
-            line-height: 1.6;
-            margin-bottom: 12px;
+            font-size: 18px;
+            line-height: 1.8;
+            margin-bottom: 28px;
             color: #333;
             font-weight: 500;
-            flex-shrink: 0;
         }
 
         .options {
-            margin-bottom: 12px;
-            flex-shrink: 0;
+            margin-bottom: 28px;
         }
 
         .option {
             background: #f9f9f9;
             border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 10px;
-            margin-bottom: 8px;
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 14px;
             cursor: pointer;
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            user-select: none;
-            -webkit-user-select: none;
-            touch-action: manipulation;
+        }
+
+        .option:hover:not(.disabled) {
+            background: #f0f0f0;
+            border-color: #667eea;
+            transform: translateX(4px);
         }
 
         .option.selected {
@@ -278,14 +272,14 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 28px;
-            height: 28px;
+            width: 36px;
+            height: 36px;
             background: #667eea;
             color: white;
             border-radius: 50%;
-            margin-right: 10px;
+            margin-right: 16px;
             font-weight: bold;
-            font-size: 13px;
+            font-size: 15px;
             flex-shrink: 0;
         }
 
@@ -299,34 +293,36 @@
 
         .option-text {
             flex: 1;
-            font-size: 14px;
-            line-height: 1.5;
+            font-size: 16px;
+            line-height: 1.6;
         }
 
         .judge-options {
             display: flex;
-            gap: 10px;
+            gap: 20px;
             justify-content: center;
-            margin-bottom: 12px;
-            flex-shrink: 0;
+            margin-bottom: 28px;
         }
 
         .judge-btn {
             flex: 1;
-            max-width: 150px;
-            padding: 15px;
-            border: 2px solid #e0e0e0;
+            max-width: 200px;
+            padding: 20px;
+            border: 3px solid #e0e0e0;
             background: #f9f9f9;
-            border-radius: 10px;
+            border-radius: 12px;
             cursor: pointer;
             transition: all 0.3s ease;
             text-align: center;
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 600;
             color: #333;
-            user-select: none;
-            -webkit-user-select: none;
-            touch-action: manipulation;
+        }
+
+        .judge-btn:hover:not(.disabled) {
+            border-color: #667eea;
+            background: #f0f0ff;
+            transform: scale(1.05);
         }
 
         .judge-btn.selected {
@@ -354,11 +350,10 @@
         .answer-section {
             background: #fff8e1;
             border: 2px solid #ffd54f;
-            border-radius: 8px;
-            padding: 10px;
-            margin-bottom: 12px;
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 25px;
             display: none;
-            flex-shrink: 0;
         }
 
         .answer-section.show {
@@ -379,7 +374,7 @@
         @keyframes fadeIn {
             from {
                 opacity: 0;
-                transform: translateY(-5px);
+                transform: translateY(-10px);
             }
             to {
                 opacity: 1;
@@ -390,41 +385,41 @@
         .answer-label {
             font-weight: 600;
             color: #f57c00;
-            margin-bottom: 6px;
-            font-size: 13px;
+            margin-bottom: 10px;
+            font-size: 15px;
         }
 
         .answer-value {
-            font-size: 15px;
+            font-size: 18px;
             color: #333;
             font-weight: 600;
         }
 
         .result-icon {
             display: inline-block;
-            margin-right: 5px;
-            font-size: 16px;
+            margin-right: 8px;
+            font-size: 20px;
         }
 
         .buttons {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            flex-shrink: 0;
-            padding-top: 10px;
+            gap: 15px;
         }
 
         .btn {
-            padding: 12px 20px;
+            padding: 14px 28px;
             border: none;
-            border-radius: 8px;
-            font-size: 14px;
+            border-radius: 10px;
+            font-size: 16px;
             cursor: pointer;
             transition: all 0.3s ease;
             font-weight: 600;
-            user-select: none;
-            -webkit-user-select: none;
-            touch-action: manipulation;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
         .btn-next {
@@ -432,18 +427,24 @@
             color: white;
         }
 
+        .btn-next:hover:not(:disabled) {
+            background: #0b7dda;
+        }
+
         .btn-prev {
             background: #9e9e9e;
             color: white;
         }
 
+        .btn-prev:hover:not(:disabled) {
+            background: #757575;
+        }
+
         .btn:disabled {
             background: #ccc;
             cursor: not-allowed;
-        }
-
-        .btn:active:not(:disabled) {
-            transform: scale(0.95);
+            transform: none;
+            box-shadow: none;
         }
 
         .completion-modal {
@@ -457,7 +458,6 @@
             justify-content: center;
             align-items: center;
             z-index: 1000;
-            padding: 20px;
         }
 
         .completion-modal.show {
@@ -467,115 +467,63 @@
 
         .modal-content {
             background: white;
-            padding: 30px 20px;
+            padding: 45px;
             border-radius: 15px;
             text-align: center;
-            max-width: 350px;
-            width: 100%;
+            max-width: 450px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.3);
         }
 
         .modal-content h2 {
             color: #4caf50;
-            margin-bottom: 20px;
-            font-size: 24px;
+            margin-bottom: 25px;
+            font-size: 28px;
         }
 
         .modal-stats {
-            margin: 20px 0;
-            font-size: 15px;
-            line-height: 1.8;
+            margin: 25px 0;
+            font-size: 17px;
+            line-height: 2;
         }
 
         .modal-stats p {
-            margin: 6px 0;
+            margin: 8px 0;
         }
 
         .modal-buttons {
             display: flex;
-            gap: 10px;
+            gap: 15px;
             justify-content: center;
-            margin-top: 15px;
+            margin-top: 20px;
         }
 
+        /* 多选题提示 */
         .multi-select-hint {
             background: #e3f2fd;
             border: 2px solid #2196F3;
-            border-radius: 6px;
-            padding: 8px;
-            margin-bottom: 10px;
-            font-size: 12px;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 15px;
+            font-size: 14px;
             color: #1976d2;
             text-align: center;
-            flex-shrink: 0;
         }
 
-        /* 桌面端优化 */
-        @media (min-width: 769px) {
-            body {
-                padding: 20px;
-            }
-
+        @media (max-width: 768px) {
             .container {
-                max-height: none;
-            }
-
-            .header h1 {
-                font-size: 32px;
-                margin-bottom: 10px;
-            }
-
-            .header .subtitle {
-                font-size: 14px;
+                margin: 10px;
             }
 
             .stats {
-                padding: 20px;
-                gap: 15px;
+                grid-template-columns: repeat(2, 1fr);
             }
 
-            .stat-item {
-                padding: 10px;
-            }
-
-            .stat-label {
-                font-size: 13px;
-            }
-
-            .stat-value {
-                font-size: 24px;
+            .buttons {
+                grid-template-columns: 1fr;
             }
 
             .question-container {
-                padding: 35px;
-                overflow-y: visible;
-            }
-
-            .question-text {
-                font-size: 18px;
-                margin-bottom: 28px;
-            }
-
-            .option {
-                padding: 16px;
-                margin-bottom: 14px;
-            }
-
-            .option:hover:not(.disabled) {
-                background: #f0f0f0;
-                border-color: #667eea;
-                transform: translateX(4px);
-            }
-
-            .judge-btn:hover:not(.disabled) {
-                border-color: #667eea;
-                background: #f0f0ff;
-                transform: scale(1.05);
-            }
-
-            .btn:hover:not(:disabled) {
-                transform: translateY(-2px);
-                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                padding: 20px;
             }
         }
     </style>
@@ -583,10 +531,10 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>♥️🐷♥️♥️🐷♥️</h1>
+            <h1>♥️🐷♥️在线刷题系统♥️🐷♥️</h1>
             <div class="subtitle">
-                共 1535 道题
-                <span class="save-indicator" id="saveIndicator">✓ 已保存</span>
+                     共 1535 道题
+                <span class="save-indicator" id="saveIndicator">✓ 已自动保存</span>
             </div>
             <div class="progress-info">
                 <span id="progressText">准备开始...</span>
@@ -616,17 +564,17 @@
         </div>
 
         <div class="filter-section">
-            <div class="filter-label">
-                <span>筛选:</span>
-                <button class="reset-btn" onclick="resetProgress()">清除</button>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <div class="filter-label">筛选条件：</div>
+                <button class="reset-btn" onclick="resetProgress()">🗑️ 清除进度</button>
             </div>
             <div class="filter-buttons">
-                <button class="filter-btn active" onclick="filterQuestions('all')">全部</button>
-                <button class="filter-btn" onclick="filterQuestions('公共部分')">公共</button>
-                <button class="filter-btn" onclick="filterQuestions('专业部分')">专业</button>
-                <button class="filter-btn" onclick="filterQuestions('单选题')">单选</button>
-                <button class="filter-btn" onclick="filterQuestions('多选题')">多选</button>
-                <button class="filter-btn" onclick="filterQuestions('判断题')">判断</button>
+                <button class="filter-btn active" onclick="filterQuestions('all')">全部题目</button>
+                <button class="filter-btn" onclick="filterQuestions('公共部分')">公共部分</button>
+                <button class="filter-btn" onclick="filterQuestions('专业部分')">专业部分</button>
+                <button class="filter-btn" onclick="filterQuestions('单选题')">单选题</button>
+                <button class="filter-btn" onclick="filterQuestions('多选题')">多选题</button>
+                <button class="filter-btn" onclick="filterQuestions('判断题')">判断题</button>
             </div>
         </div>
 
@@ -634,8 +582,8 @@
             <div class="question-header">
                 <span class="question-number" id="questionNumber">第 1 题</span>
                 <div class="question-badges">
-                    <span class="question-category" id="questionCategory">公共</span>
-                    <span class="question-type" id="questionType">单选</span>
+                    <span class="question-category" id="questionCategory">公共部分</span>
+                    <span class="question-type" id="questionType">单选题</span>
                 </div>
             </div>
 
@@ -662,16 +610,16 @@
 
     <div class="completion-modal" id="completionModal">
         <div class="modal-content">
-            <h2>🎉 完成！</h2>
+            <h2>🎉 恭喜完成！</h2>
             <div class="modal-stats">
-                <p>答题：<strong id="modalTotal">0</strong></p>
-                <p>正确：<strong id="modalCorrect" style="color: #4caf50;">0</strong></p>
-                <p>错误：<strong id="modalWrong" style="color: #f44336;">0</strong></p>
+                <p>答题总数：<strong id="modalTotal">0</strong></p>
+                <p>答对题数：<strong id="modalCorrect" style="color: #4caf50;">0</strong></p>
+                <p>答错题数：<strong id="modalWrong" style="color: #f44336;">0</strong></p>
                 <p>正确率：<strong id="modalAccuracy" style="color: #2196F3;">0%</strong></p>
             </div>
             <div class="modal-buttons">
-                <button class="btn btn-next" onclick="continueQuiz()">继续</button>
-                <button class="btn btn-prev" onclick="restartQuiz()">重置</button>
+                <button class="btn btn-next" onclick="continueQuiz()">继续刷题</button>
+                <button class="btn btn-prev" onclick="restartQuiz()">重新开始</button>
             </div>
         </div>
     </div>
@@ -701,7 +649,7 @@
             indicator.classList.add('show');
             setTimeout(() => {
                 indicator.classList.remove('show');
-            }, 1500);
+            }, 2000);
         }
 
         function loadProgress() {
@@ -716,8 +664,10 @@
                         userAnswers.push(null);
                     }
 
+                    console.log('已加载保存的进度:', progress.timestamp);
                     return true;
                 } catch (e) {
+                    console.error('加载进度失败:', e);
                     return false;
                 }
             }
@@ -725,12 +675,13 @@
         }
 
         function resetProgress() {
-            if (confirm('确定清除所有进度吗？')) {
+            if (confirm('确定要清除所有答题进度吗？此操作不可恢复！')) {
                 localStorage.removeItem(STORAGE_KEY);
                 currentIndex = 0;
                 userAnswers = new Array(filteredQuestions.length).fill(null);
                 showQuestion();
                 updateStats();
+                alert('进度已清除！');
             }
         }
 
@@ -745,7 +696,7 @@
                 initQuiz();
             } catch (error) {
                 console.error('题库加载失败:', error);
-                alert('题库加载失败');
+                alert('题库加载失败，请确保questions.json文件存在');
             }
         }
 
@@ -770,32 +721,19 @@
             }
 
             const question = filteredQuestions[currentIndex];
-
-            // ⭐ 关键：清除所有选中状态，防止默认选择
             selectedOptions.clear();
 
+            // 清除自动提交定时器
             if (autoSubmitTimeout) {
                 clearTimeout(autoSubmitTimeout);
                 autoSubmitTimeout = null;
             }
 
-            // 滚动到顶部
-            const container = document.querySelector('.question-container');
-            if (container) {
-                container.scrollTop = 0;
-            }
-
-            document.getElementById('questionNumber').textContent = `${currentIndex + 1}/${filteredQuestions.length}`;
-            document.getElementById('questionCategory').textContent = question.category === '公共部分' ? '公共' : '专业';
+            document.getElementById('questionNumber').textContent = `第 ${currentIndex + 1} / ${filteredQuestions.length} 题`;
+            document.getElementById('questionCategory').textContent = question.category;
 
             const typeElement = document.getElementById('questionType');
-            const typeMap = {
-                '单选题': '单选',
-                '多选题': '多选',
-                '判断题': '判断',
-                '案例题': '案例'
-            };
-            typeElement.textContent = typeMap[question.type] || question.type;
+            typeElement.textContent = question.type;
             typeElement.className = 'question-type';
             if (question.type === '多选题') {
                 typeElement.classList.add('multiple');
@@ -805,9 +743,10 @@
 
             document.getElementById('questionText').textContent = question.question;
 
+            // 显示多选题提示
             const hintContainer = document.getElementById('multiSelectHint');
             if (question.type === '多选题') {
-                hintContainer.innerHTML = '<div class="multi-select-hint">💡 多选题：选完后等1秒自动提交</div>';
+                hintContainer.innerHTML = '<div class="multi-select-hint">💡 多选题：请选择所有正确答案后会自动提交</div>';
             } else {
                 hintContainer.innerHTML = '';
             }
@@ -822,16 +761,8 @@
                     const btn = document.createElement('div');
                     btn.className = 'judge-btn';
                     btn.textContent = opt;
+                    btn.onclick = () => selectJudgeOption(opt);
                     btn.dataset.value = opt;
-                    // ⭐ 使用 touchstart 和 click 双重事件，防止默认行为
-                    btn.addEventListener('touchstart', (e) => {
-                        e.preventDefault();
-                        selectJudgeOption(opt);
-                    }, {passive: false});
-                    btn.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        selectJudgeOption(opt);
-                    });
                     container.appendChild(btn);
                 });
             } else {
@@ -839,28 +770,19 @@
                 question.options.forEach(option => {
                     const optionDiv = document.createElement('div');
                     optionDiv.className = 'option';
+                    optionDiv.onclick = () => selectOption(option.label);
                     optionDiv.innerHTML = `
                         <span class="option-label">${option.label}</span>
                         <span class="option-text">${option.text}</span>
                     `;
                     optionDiv.dataset.label = option.label;
-                    // ⭐ 使用 touchstart 和 click 双重事件
-                    optionDiv.addEventListener('touchstart', (e) => {
-                        e.preventDefault();
-                        selectOption(option.label);
-                    }, {passive: false});
-                    optionDiv.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        selectOption(option.label);
-                    });
                     container.appendChild(optionDiv);
                 });
             }
 
             document.getElementById('answerSection').classList.remove('show', 'correct-answer', 'wrong-answer');
 
-            // ⭐ 只在有保存的答案时才恢复选中状态
-            if (userAnswers[currentIndex] && userAnswers[currentIndex].submitted) {
+            if (userAnswers[currentIndex]) {
                 const answer = userAnswers[currentIndex];
                 if (question.type === '判断题') {
                     selectedOptions.add(answer.answer);
@@ -873,7 +795,9 @@
                         if (opt) opt.classList.add('selected');
                     }
                 }
-                showAnswerFeedback();
+                if (answer.submitted) {
+                    showAnswerFeedback();
+                }
             }
 
             document.getElementById('prevBtn').disabled = currentIndex === 0;
@@ -896,6 +820,7 @@
                 selectedOptions.add(label);
                 optionElement.classList.add('selected');
 
+                // ⭐ 单选题：选择后立即自动提交
                 autoSubmitAnswer();
             } else if (question.type === '多选题') {
                 if (selectedOptions.has(label)) {
@@ -906,6 +831,7 @@
                     optionElement.classList.add('selected');
                 }
 
+                // ⭐ 多选题：选择后延迟1秒自动提交（给用户时间继续选择）
                 if (autoSubmitTimeout) {
                     clearTimeout(autoSubmitTimeout);
                 }
@@ -928,9 +854,11 @@
             const btn = document.querySelector(`.judge-btn[data-value="${value}"]`);
             if (btn) btn.classList.add('selected');
 
+            // ⭐ 判断题：选择后立即自动提交
             autoSubmitAnswer();
         }
 
+        // ⭐ 自动提交答案
         function autoSubmitAnswer() {
             if (selectedOptions.size === 0) return;
 
@@ -951,6 +879,7 @@
             updateStats();
             saveProgress();
 
+            // ⭐ 如果答对了，2秒后自动跳转下一题
             if (isCorrect && currentIndex < filteredQuestions.length - 1) {
                 setTimeout(() => {
                     nextQuestion();
@@ -974,17 +903,18 @@
             if (isCorrect) {
                 resultIcon.textContent = '✓';
                 resultIcon.style.color = '#4caf50';
-                resultText.textContent = '正确！';
+                resultText.textContent = '回答正确！答案：';
                 answerSection.classList.add('correct-answer');
             } else {
                 resultIcon.textContent = '✗';
                 resultIcon.style.color = '#f44336';
-                resultText.textContent = '错误！正确答案：';
+                resultText.textContent = '回答错误！正确答案：';
                 answerSection.classList.add('wrong-answer');
             }
 
             answerSection.classList.add('show');
 
+            // 禁用所有选项
             if (question.type === '判断题') {
                 document.querySelectorAll('.judge-btn').forEach(btn => {
                     const value = btn.dataset.value;
@@ -1045,7 +975,7 @@
             const progress = ((currentIndex + 1) / filteredQuestions.length) * 100;
             document.getElementById('progressFill').style.width = progress + '%';
             document.getElementById('progressText').textContent = 
-                `${currentIndex + 1}/${filteredQuestions.length}`;
+                `进度：${currentIndex + 1} / ${filteredQuestions.length}`;
         }
 
         function filterQuestions(filter) {
@@ -1089,7 +1019,7 @@
         }
 
         function restartQuiz() {
-            if (confirm('确定重新开始吗？')) {
+            if (confirm('确定要重新开始吗？当前进度将被清除。')) {
                 document.getElementById('completionModal').classList.remove('show');
                 localStorage.removeItem(STORAGE_KEY);
                 currentIndex = 0;
