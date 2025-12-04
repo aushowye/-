@@ -242,7 +242,7 @@
             align-items: center;
         }
 
-        .option:hover {
+        .option:hover:not(.disabled) {
             background: #f0f0f0;
             border-color: #667eea;
             transform: translateX(4px);
@@ -319,7 +319,7 @@
             color: #333;
         }
 
-        .judge-btn:hover {
+        .judge-btn:hover:not(.disabled) {
             border-color: #667eea;
             background: #f0f0ff;
             transform: scale(1.05);
@@ -342,6 +342,11 @@
             color: #c62828;
         }
 
+        .judge-btn.disabled {
+            cursor: not-allowed;
+            opacity: 0.9;
+        }
+
         .answer-section {
             background: #fff8e1;
             border: 2px solid #ffd54f;
@@ -354,6 +359,16 @@
         .answer-section.show {
             display: block;
             animation: fadeIn 0.4s ease;
+        }
+
+        .answer-section.correct-answer {
+            background: #e8f5e9;
+            border-color: #4caf50;
+        }
+
+        .answer-section.wrong-answer {
+            background: #ffebee;
+            border-color: #f44336;
         }
 
         @keyframes fadeIn {
@@ -388,7 +403,7 @@
 
         .buttons {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-columns: 1fr 1fr;
             gap: 15px;
         }
 
@@ -402,18 +417,9 @@
             font-weight: 600;
         }
 
-        .btn:hover {
+        .btn:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-
-        .btn-submit {
-            background: #4caf50;
-            color: white;
-        }
-
-        .btn-submit:hover {
-            background: #45a049;
         }
 
         .btn-next {
@@ -421,7 +427,7 @@
             color: white;
         }
 
-        .btn-next:hover {
+        .btn-next:hover:not(:disabled) {
             background: #0b7dda;
         }
 
@@ -430,7 +436,7 @@
             color: white;
         }
 
-        .btn-prev:hover {
+        .btn-prev:hover:not(:disabled) {
             background: #757575;
         }
 
@@ -491,6 +497,18 @@
             margin-top: 20px;
         }
 
+        /* 多选题提示 */
+        .multi-select-hint {
+            background: #e3f2fd;
+            border: 2px solid #2196F3;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #1976d2;
+            text-align: center;
+        }
+
         @media (max-width: 768px) {
             .container {
                 margin: 10px;
@@ -515,7 +533,7 @@
         <div class="header">
             <h1>♥️🐷♥️在线刷题系统♥️🐷♥️</h1>
             <div class="subtitle">
-                共 1535 道题 
+                     共 1535 道题
                 <span class="save-indicator" id="saveIndicator">✓ 已自动保存</span>
             </div>
             <div class="progress-info">
@@ -571,6 +589,8 @@
 
             <div class="question-text" id="questionText">加载中...</div>
 
+            <div id="multiSelectHint"></div>
+
             <div id="optionsContainer"></div>
 
             <div class="answer-section" id="answerSection">
@@ -583,7 +603,6 @@
 
             <div class="buttons">
                 <button class="btn btn-prev" onclick="previousQuestion()" id="prevBtn">⬅ 上一题</button>
-                <button class="btn btn-submit" onclick="submitAnswer()" id="submitBtn">✓ 提交答案</button>
                 <button class="btn btn-next" onclick="nextQuestion()" id="nextBtn">下一题 ➡</button>
             </div>
         </div>
@@ -611,11 +630,10 @@
         let currentIndex = 0;
         let userAnswers = [];
         let selectedOptions = new Set();
+        let autoSubmitTimeout = null;
 
-        // ⭐ 本地存储功能
         const STORAGE_KEY = 'fujian_exam_progress';
 
-        // 保存进度到本地存储
         function saveProgress() {
             const progress = {
                 currentIndex: currentIndex,
@@ -626,7 +644,6 @@
             showSaveIndicator();
         }
 
-        // 显示保存提示
         function showSaveIndicator() {
             const indicator = document.getElementById('saveIndicator');
             indicator.classList.add('show');
@@ -635,7 +652,6 @@
             }, 2000);
         }
 
-        // 加载已保存的进度
         function loadProgress() {
             const saved = localStorage.getItem(STORAGE_KEY);
             if (saved) {
@@ -644,7 +660,6 @@
                     currentIndex = progress.currentIndex || 0;
                     userAnswers = progress.userAnswers || [];
 
-                    // 确保userAnswers长度匹配题目数量
                     while (userAnswers.length < filteredQuestions.length) {
                         userAnswers.push(null);
                     }
@@ -659,7 +674,6 @@
             return false;
         }
 
-        // 清除进度
         function resetProgress() {
             if (confirm('确定要清除所有答题进度吗？此操作不可恢复！')) {
                 localStorage.removeItem(STORAGE_KEY);
@@ -689,11 +703,9 @@
         function initQuiz() {
             document.getElementById('totalQuestions').textContent = filteredQuestions.length;
 
-            // 尝试加载保存的进度
             const hasProgress = loadProgress();
 
             if (!hasProgress) {
-                // 没有保存的进度，从头开始
                 currentIndex = 0;
                 userAnswers = new Array(filteredQuestions.length).fill(null);
             }
@@ -711,6 +723,12 @@
             const question = filteredQuestions[currentIndex];
             selectedOptions.clear();
 
+            // 清除自动提交定时器
+            if (autoSubmitTimeout) {
+                clearTimeout(autoSubmitTimeout);
+                autoSubmitTimeout = null;
+            }
+
             document.getElementById('questionNumber').textContent = `第 ${currentIndex + 1} / ${filteredQuestions.length} 题`;
             document.getElementById('questionCategory').textContent = question.category;
 
@@ -724,6 +742,14 @@
             }
 
             document.getElementById('questionText').textContent = question.question;
+
+            // 显示多选题提示
+            const hintContainer = document.getElementById('multiSelectHint');
+            if (question.type === '多选题') {
+                hintContainer.innerHTML = '<div class="multi-select-hint">💡 多选题：请选择所有正确答案后会自动提交</div>';
+            } else {
+                hintContainer.innerHTML = '';
+            }
 
             const container = document.getElementById('optionsContainer');
             container.innerHTML = '';
@@ -754,7 +780,7 @@
                 });
             }
 
-            document.getElementById('answerSection').classList.remove('show');
+            document.getElementById('answerSection').classList.remove('show', 'correct-answer', 'wrong-answer');
 
             if (userAnswers[currentIndex]) {
                 const answer = userAnswers[currentIndex];
@@ -793,13 +819,26 @@
                 });
                 selectedOptions.add(label);
                 optionElement.classList.add('selected');
-            } else {
+
+                // ⭐ 单选题：选择后立即自动提交
+                autoSubmitAnswer();
+            } else if (question.type === '多选题') {
                 if (selectedOptions.has(label)) {
                     selectedOptions.delete(label);
                     optionElement.classList.remove('selected');
                 } else {
                     selectedOptions.add(label);
                     optionElement.classList.add('selected');
+                }
+
+                // ⭐ 多选题：选择后延迟1秒自动提交（给用户时间继续选择）
+                if (autoSubmitTimeout) {
+                    clearTimeout(autoSubmitTimeout);
+                }
+                if (selectedOptions.size > 0) {
+                    autoSubmitTimeout = setTimeout(() => {
+                        autoSubmitAnswer();
+                    }, 1000);
                 }
             }
         }
@@ -814,13 +853,14 @@
             selectedOptions.add(value);
             const btn = document.querySelector(`.judge-btn[data-value="${value}"]`);
             if (btn) btn.classList.add('selected');
+
+            // ⭐ 判断题：选择后立即自动提交
+            autoSubmitAnswer();
         }
 
-        function submitAnswer() {
-            if (selectedOptions.size === 0) {
-                alert('请先选择答案');
-                return;
-            }
+        // ⭐ 自动提交答案
+        function autoSubmitAnswer() {
+            if (selectedOptions.size === 0) return;
 
             const question = filteredQuestions[currentIndex];
             const userAnswer = question.type === '判断题' 
@@ -837,7 +877,14 @@
 
             showAnswerFeedback();
             updateStats();
-            saveProgress(); // ⭐ 提交答案后自动保存
+            saveProgress();
+
+            // ⭐ 如果答对了，2秒后自动跳转下一题
+            if (isCorrect && currentIndex < filteredQuestions.length - 1) {
+                setTimeout(() => {
+                    nextQuestion();
+                }, 2000);
+            }
         }
 
         function showAnswerFeedback() {
@@ -847,23 +894,31 @@
 
             document.getElementById('correctAnswer').textContent = correctAnswer;
 
+            const answerSection = document.getElementById('answerSection');
             const resultIcon = document.getElementById('resultIcon');
             const resultText = document.getElementById('resultText');
+
+            answerSection.classList.remove('correct-answer', 'wrong-answer');
+
             if (isCorrect) {
                 resultIcon.textContent = '✓';
                 resultIcon.style.color = '#4caf50';
                 resultText.textContent = '回答正确！答案：';
+                answerSection.classList.add('correct-answer');
             } else {
                 resultIcon.textContent = '✗';
                 resultIcon.style.color = '#f44336';
                 resultText.textContent = '回答错误！正确答案：';
+                answerSection.classList.add('wrong-answer');
             }
 
-            document.getElementById('answerSection').classList.add('show');
+            answerSection.classList.add('show');
 
+            // 禁用所有选项
             if (question.type === '判断题') {
                 document.querySelectorAll('.judge-btn').forEach(btn => {
                     const value = btn.dataset.value;
+                    btn.classList.add('disabled');
                     btn.classList.remove('correct', 'wrong');
                     if (value === correctAnswer) {
                         btn.classList.add('correct');
@@ -892,7 +947,7 @@
             if (currentIndex > 0) {
                 currentIndex--;
                 showQuestion();
-                saveProgress(); // ⭐ 切换题目时保存
+                saveProgress();
             }
         }
 
@@ -900,7 +955,7 @@
             if (currentIndex < filteredQuestions.length - 1) {
                 currentIndex++;
                 showQuestion();
-                saveProgress(); // ⭐ 切换题目时保存
+                saveProgress();
             } else {
                 showCompletionModal();
             }
@@ -940,10 +995,7 @@
             document.getElementById('totalQuestions').textContent = filteredQuestions.length;
             currentIndex = 0;
             userAnswers = new Array(filteredQuestions.length).fill(null);
-
-            // 清除筛选时的进度
             localStorage.removeItem(STORAGE_KEY);
-
             showQuestion();
             updateStats();
         }
