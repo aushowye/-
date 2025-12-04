@@ -1,0 +1,11 @@
+{
+  "name": "fujian-exam-system",
+  "version": "1.0.0",
+  "description": "福建题库在线刷题系统",
+  "scripts": {
+    "start": "python -m http.server 8000"
+  },
+  "keywords": ["exam", "quiz", "education"],
+  "author": "",
+  "license": "MIT"
+}
