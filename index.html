@@ -269,6 +269,7 @@
             display: flex;
             gap: 20px;
             justify-content: center;
+            margin-bottom: 28px;
         }
 
         .judge-btn {
@@ -474,7 +475,7 @@
     <div class="container">
         <div class="header">
             <h1>📚 在线刷题系统</h1>
-            <div class="subtitle">支持单选题、多选题、判断题 | 实时反馈答题结果</div>
+            <div class="subtitle">共 1535 道题 | 支持单选、多选、判断、案例题</div>
             <div class="progress-info">
                 <span id="progressText">准备开始...</span>
             </div>
@@ -565,17 +566,17 @@
 
         async function loadQuestions() {
             try {
-                // 修改这里：改为questions_complete.json
-                const response = await fetch('questions_complete.json');
+                // ⭐ 关键：这里使用questions.json
+                const response = await fetch('questions.json');
                 if (!response.ok) {
-                    throw new Error('HTTP error! status: ' + response.status);
+                    throw new Error('HTTP ' + response.status);
                 }
                 allQuestions = await response.json();
                 filteredQuestions = allQuestions;
                 initQuiz();
             } catch (error) {
-                console.error('加载题库失败:', error);
-                alert('题库加载失败，请确保questions_complete.json文件存在');
+                console.error('题库加载失败:', error);
+                alert('题库加载失败，请确保questions.json文件存在');
             }
         }
 
@@ -589,7 +590,7 @@
 
         function showQuestion() {
             if (filteredQuestions.length === 0) {
-                document.getElementById('questionText').textContent = '没有找到题目，请检查筛选条件';
+                document.getElementById('questionText').textContent = '没有找到题目';
                 return;
             }
 
